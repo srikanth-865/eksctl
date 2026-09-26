@@ -1,6 +1,10 @@
 # eksctl create cluster --config-file=eksctl.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1a8f095 (oil&karam)
 metadata:
   name: roboshop
   region: us-east-1

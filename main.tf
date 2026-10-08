@@ -8,7 +8,7 @@ resource "aws_instance" "workstation" {
   })
 
   root_block_device {
-    volume_size = 50
+    volume_size = 50   #So the workstation gets a 50 GB EBS disk
     volume_type = "gp3"
     # EBS volume tags
     tags = merge(

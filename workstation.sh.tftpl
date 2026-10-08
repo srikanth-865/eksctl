@@ -36,7 +36,7 @@ tar -xzf k9s_Linux_amd64.tar.gz -C /tmp k9s && rm k9s_Linux_amd64.tar.gz
 install -m 0755 /tmp/k9s /usr/local/bin/k9s && rm /tmp/k9s
 
 
-# AWS CLI configure for ec2-user
+# AWS CLI configure for ec2-user as we are passing our secret & Acces key here
 mkdir -p /home/ec2-user/.aws
 cat <<EOF > /home/ec2-user/.aws/credentials
 [default]
@@ -54,12 +54,31 @@ chown -R ec2-user:ec2-user /home/ec2-user/.aws
 chmod 600 /home/ec2-user/.aws/credentials
 chmod 600 /home/ec2-user/.aws/config
 
-# Clone eksctl repo and create EKS cluster
+# Clone eksctl repo and create EKS cluster  for creating cluster insdie our repo 
 cd /home/ec2-user
 sudo -u ec2-user git clone  https://github.com/srikanth-865/eksctl.git
 cd eksctl
 sudo -u ec2-user /usr/local/bin/eksctl create cluster -f eksctl.yaml
 
-# Authenticate kubectl with the cluster
-sudo -u ec2-user aws eks update-kubeconfig --region us-east-1 --name roboshop
+# Authenticate kubectl with the cluster  
+#Configure kubectl to connect to the roboshop EKS cluster.
+#configures your local kubectl tool to connect to your Amazon EKS cluster named roboshop in the us-east-1 AWS region
+sudo -u ec2-user aws eks update-kubeconfig --region us-east-1 --name roboshop 
 sudo -u ec2-user /usr/local/bin/kubectl get nodes
+
+
+# In very simple words
+
+# Think of it like this:
+
+# You login to EC2 using MobaXterm
+#             ↓
+# EC2 does not yet know which EKS cluster kubectl should use
+#             ↓
+# Run update-kubeconfig
+#             ↓
+# kubectl is configured to connect to "roboshop"
+#             ↓
+# kubectl get nodes
+# kubectl get pods
+# kubectl get svc

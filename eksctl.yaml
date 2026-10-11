@@ -6,173 +6,173 @@ metadata:
   region: us-east-1
 managedNodeGroups:
   - name: managed
-    instanceTypes: ["t3.small"]
+    instanceTypes: ["t3.small","t3.micro","t4g.micro","t4g.small"]
     desiredCapacity: 2
     spot: false
 
 
 
 
-   /* Not exactly. Cluster ≠ master. This is the important distinction.
+#    /* Not exactly. Cluster ≠ master. This is the important distinction.
 
-Think of it this way
+# Think of it this way
 
-A Kubernetes cluster is the whole system:
+# A Kubernetes cluster is the whole system:
 
-             EKS CLUSTER
-              "roboshop"
-                  │
-        ┌─────────┴─────────┐
-        │                   │
-   CONTROL PLANE         WORKER NODES
-   (master)              (EC2 machines)
-        │                   │
-        │              ┌────┴────┐
-        │              │         │
-        │            Node 1    Node 2
-        │            t3.small  t3.small
-        │
-     Kubernetes
-       brain
+#              EKS CLUSTER
+#               "roboshop"
+#                   │
+#         ┌─────────┴─────────┐
+#         │                   │
+#    CONTROL PLANE         WORKER NODES
+#    (master)              (EC2 machines)
+#         │                   │
+#         │              ┌────┴────┐
+#         │              │         │
+#         │            Node 1    Node 2
+#         │            t3.small  t3.small
+#         │
+#      Kubernetes
+#        brain
 
-So:
+# So:
 
-Cluster = the whole Kubernetes environment
-Control plane (master) = the brain inside the cluster
-Node/worker node = machine that runs Pods
+# Cluster = the whole Kubernetes environment
+# Control plane (master) = the brain inside the cluster
+# Node/worker node = machine that runs Pods
 
-In your configuration
-metadata:
-  name: roboshop
-roboshop is the cluster name, not the master.
+# In your configuration
+# metadata:
+#   name: roboshop
+# roboshop is the cluster name, not the master.
 
-managedNodeGroups:
-  - name: managed
+# managedNodeGroups:
+#   - name: managed
 
-managed is the worker node group.
+# managed is the worker node group.
 
-Because you have:
+# Because you have:
 
-desiredCapacity: 2
+# desiredCapacity: 2
 
-you are asking for 2 worker nodes.
+# you are asking for 2 worker nodes.
 
-So the correct statement is:
+# So the correct statement is:
 
-"My EKS cluster is named roboshop. It has an AWS-managed control plane and a managed node group containing 2 worker nodes."
+# "My EKS cluster is named roboshop. It has an AWS-managed control plane and a managed node group containing 2 worker nodes."
 
-If someone casually says "master", they usually mean the control plane, but technically the cluster itself is not the master. */
+# If someone casually says "master", they usually mean the control plane, but technically the cluster itself is not the master. */
 
-##################################
+# ##################################
 
-/*Absolutely. The easiest way is to separate the 3 words: Cluster, Control Plane, and Node.
+# /*Absolutely. The easiest way is to separate the 3 words: Cluster, Control Plane, and Node.
 
-1. Kubernetes Cluster = the whole setup
+# 1. Kubernetes Cluster = the whole setup
 
-A cluster is a group of Kubernetes components working together.
+# A cluster is a group of Kubernetes components working together.
 
-                 KUBERNETES CLUSTER
-                    "roboshop"
-                         │
-            ┌────────────┴────────────┐
-            │                         │
-       CONTROL PLANE              WORKER NODES
-        (Master)                    (Nodes)
-            │                         │
-            │                  ┌──────┴──────┐
-            │                  │             │
-            │                Node 1        Node 2
-            │               t3.small      t3.small
-            │                  │             │
-            │                Pods          Pods
+#                  KUBERNETES CLUSTER
+#                     "roboshop"
+#                          │
+#             ┌────────────┴────────────┐
+#             │                         │
+#        CONTROL PLANE              WORKER NODES
+#         (Master)                    (Nodes)
+#             │                         │
+#             │                  ┌──────┴──────┐
+#             │                  │             │
+#             │                Node 1        Node 2
+#             │               t3.small      t3.small
+#             │                  │             │
+#             │                Pods          Pods
 
-So:
+# So:
 
-Cluster = Control Plane + Worker Nodes
+# Cluster = Control Plane + Worker Nodes
 
-2. Control Plane = the brain/master
+# 2. Control Plane = the brain/master
 
-The control plane manages the Kubernetes cluster.
+# The control plane manages the Kubernetes cluster.
 
-It decides things such as:
+# It decides things such as:
 
-Where should a Pod run?
-How many replicas should exist?
-Is a node healthy?
-What should happen when a Pod fails?
+# Where should a Pod run?
+# How many replicas should exist?
+# Is a node healthy?
+# What should happen when a Pod fails?
 
-In traditional Kubernetes terminology, you may hear:
+# In traditional Kubernetes terminology, you may hear:
 
-Master = Control Plane
+# Master = Control Plane
 
-In EKS, AWS manages this control plane for you.
+# In EKS, AWS manages this control plane for you.
 
-3. Worker Node = where your applications run
+# 3. Worker Node = where your applications run
 
-A worker node is a machine that actually runs your Kubernetes Pods.
+# A worker node is a machine that actually runs your Kubernetes Pods.
 
-In your configuration:
+# In your configuration:
 
-managedNodeGroups:
-  - name: managed
-    instanceTypes: ["t3.small"]
-    desiredCapacity: 2
+# managedNodeGroups:
+#   - name: managed
+#     instanceTypes: ["t3.small"]
+#     desiredCapacity: 2
 
-You are asking for:
+# You are asking for:
 
-Managed Node Group
-       │
-       ├── Worker Node 1 → t3.small
-       │
-       └── Worker Node 2 → t3.small
+# Managed Node Group
+#        │
+#        ├── Worker Node 1 → t3.small
+#        │
+#        └── Worker Node 2 → t3.small
 
-Your application Pods will run on these worker nodes.
+# Your application Pods will run on these worker nodes.
 
-Now your eksctl.yaml
-apiVersion: eksctl.io/v1alpha5
-kind: ClusterConfig
+# Now your eksctl.yaml
+# apiVersion: eksctl.io/v1alpha5
+# kind: ClusterConfig
 
-metadata:
-  name: roboshop
-  region: us-east-1
+# metadata:
+#   name: roboshop
+#   region: us-east-1
 
-managedNodeGroups:
-  - name: managed
-    instanceTypes: ["t3.small"]
-    desiredCapacity: 2
-    spot: false
+# managedNodeGroups:
+#   - name: managed
+#     instanceTypes: ["t3.small"]
+#     desiredCapacity: 2
+#     spot: false
 
-Understand it like this:
+# Understand it like this:
 
-Your YAML	Meaning
-name: roboshop	Cluster name
-region: us-east-1	Where the EKS cluster is created
-managedNodeGroups	Worker-node group
-name: managed	Node group name
-t3.small	Worker-node EC2 instance type
-desiredCapacity: 2	Start with 2 worker nodes
-spot: false	Use regular/on-demand EC2 capacity
-The complete picture
-                     AWS
-                      │
-              EKS Cluster
-              "roboshop"
-                      │
-          ┌───────────┴───────────┐
-          │                       │
-   CONTROL PLANE             NODE GROUP
-     (Master)                  "managed"
-   AWS manages                    │
-          │              ┌────────┴────────┐
-          │              │                 │
-      API Server       Worker Node 1    Worker Node 2
-      Scheduler         t3.small         t3.small
-      Controllers           │                 │
-      etcd                Pods              Pods
-⭐ Remember this one line
+# Your YAML	Meaning
+# name: roboshop	Cluster name
+# region: us-east-1	Where the EKS cluster is created
+# managedNodeGroups	Worker-node group
+# name: managed	Node group name
+# t3.small	Worker-node EC2 instance type
+# desiredCapacity: 2	Start with 2 worker nodes
+# spot: false	Use regular/on-demand EC2 capacity
+# The complete picture
+#                      AWS
+#                       │
+#               EKS Cluster
+#               "roboshop"
+#                       │
+#           ┌───────────┴───────────┐
+#           │                       │
+#    CONTROL PLANE             NODE GROUP
+#      (Master)                  "managed"
+#    AWS manages                    │
+#           │              ┌────────┴────────┐
+#           │              │                 │
+#       API Server       Worker Node 1    Worker Node 2
+#       Scheduler         t3.small         t3.small
+#       Controllers           │                 │
+#       etcd                Pods              Pods
+# ⭐ Remember this one line
 
-Cluster = the whole Kubernetes environment; Control Plane = the brain/master; Worker Nodes = machines that run the Pods.
+# Cluster = the whole Kubernetes environment; Control Plane = the brain/master; Worker Nodes = machines that run the Pods.
 
-And in EKS specifically, AWS manages the control plane, while your managed node group provides the worker nodes. */
+# And in EKS specifically, AWS manages the control plane, while your managed node group provides the worker nodes. */
 
  

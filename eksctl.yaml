@@ -6,7 +6,7 @@ metadata:
   region: us-east-1
 managedNodeGroups:
   - name: managed
-    instanceTypes: ["t3.small","t3.micro","t4g.micro","t4g.small"]
+    instanceTypes: ["t3.small","t3.micro"]
     desiredCapacity: 2
     spot: false
 
